@@ -15,10 +15,20 @@ pipeline {
         APP_NAME = "nodejs-app"
         CONTAINER_NAME = "nodejs-container-${params.BRANCH}"
         GIT_REPO = "https://github.com/goondev98/simple-nodejs.git"
-        PORT = "3000"
     }
 
     stages {
+
+        stage('Setup Environment Variables') {
+            steps {
+                script {
+                    // Set PORT dynamically based on branch
+                    env.PORT = (params.BRANCH == 'development') ? '3000' : '8000'
+                    echo "Selected branch: ${params.BRANCH}, using PORT=${env.PORT}"
+                }
+            }
+        }
+
         stage('Checkout Branch') {
             steps {
                 // Pull the selected branch from the repo
