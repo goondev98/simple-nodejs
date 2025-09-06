@@ -2,14 +2,30 @@
 pipeline {
     agent any
 
+    // Parameter to choose branch before build
+    parameters {
+        choice(
+            name: 'BRANCH',
+            choices: ['dev', 'main'],
+            description: 'Select the Git branch to build and deploy'
+        )
+    }
+
     environment {
         APP_NAME = "nodejs-app"
-        CONTAINER_NAME = "nodejs-container"
+        CONTAINER_NAME = "nodejs-container-${params.BRANCH}"
         GIT_REPO = "https://github.com/goondev98/simple-nodejs.git"
         PORT = "3000"
     }
 
     stages {
+        stage('Checkout Branch') {
+            steps {
+                // Pull the selected branch from the repo
+                git branch: "${params.BRANCH}", url: "${env.GIT_REPO}"
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
@@ -25,7 +41,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${APP_NAME}:latest", "-f docker/Dockerfile .")
+                    docker.build("${APP_NAME}:${params.BRANCH}", "-f docker/Dockerfile .")
                 }
             }
         }
@@ -42,7 +58,7 @@ pipeline {
         stage('Run New Container') {
             steps {
                 script {
-                    sh "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${APP_NAME}:latest"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${APP_NAME}:${params.BRANCH}"
                 }
             }
         }
