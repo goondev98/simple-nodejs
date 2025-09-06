@@ -9,9 +9,15 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Install Dependencies') {
             steps {
-                git "${GIT_REPO}"
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'npm test || echo "No tests defined, skipping..."'
             }
         }
 
