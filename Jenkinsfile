@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "nodejs-app"
-        CONTAINER_NAME = "nodejs-container"
-        GIT_REPO = "https://github.com/goondev98/simple-nodejs.git"
-        PORT = "3000"
+        APP_NAME = 'nodejs-app'
+        CONTAINER_NAME = 'nodejs-container'
+        GIT_REPO = 'https://github.com/goondev98/simple-nodejs.git'
+        PORT = '3000'
     }
 
     stages {
@@ -24,7 +24,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${APP_NAME}:latest", "-f docker/Dockerfile .")
+                    docker.build("${APP_NAME}:latest", '-f docker/Dockerfile .')
                 }
             }
         }
@@ -49,7 +49,9 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            node {
+                cleanWs()
+            }
         }
     }
 }
