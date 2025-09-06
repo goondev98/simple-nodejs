@@ -30,4 +30,8 @@ router.post('/login', function(req, res, next){
     return res.redirect("/users")
 })
 
+router.get('/register', function(req, res, next){
+    return res.render("auth/register.ejs")
+})
+
 module.exports = router;
