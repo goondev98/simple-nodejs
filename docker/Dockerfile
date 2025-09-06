@@ -12,7 +12,11 @@ RUN npm install
 COPY . .
 
 # Expose the port Express listens on
+# for development
 EXPOSE 3000
+
+# for main
+EXPOSE 8000
 
 # Start the app
 CMD ["npm", "start"]
