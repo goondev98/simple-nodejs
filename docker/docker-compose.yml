@@ -5,9 +5,9 @@ services:
       dockerfile: ./docker/Dockerfile
     container_name: simple_node_app
     ports:
-      - "3000:3000"
+      - "${EXTERNAL_PORT:-3000}:${INTERNAL_PORT:-3000}"
     volumes:
       - ../:/usr/src/app
       - /usr/src/app/node_modules
     environment:
-      - PORT=3000
+      - PORT=${INTERNAL_PORT:-3000}

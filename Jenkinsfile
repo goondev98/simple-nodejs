@@ -13,22 +13,21 @@ pipeline {
 
     environment {
         APP_NAME = "nodejs-app"
-        CONTAINER_NAME = "nodejs-container-${params.BRANCH}"
         GIT_REPO = "https://github.com/goondev98/simple-nodejs.git"
     }
 
     stages {
 
-        stage('Setup Environment Variables') {
+        stage('Set Environment Variables') {
             steps {
                 script {
-                    // Set PORT dynamically based on branch
-                    env.PORT = (params.BRANCH == 'development') ? '3000' : '8000'
-                    echo "Selected branch: ${params.BRANCH}, using PORT=${env.PORT}"
+                    env.CONTAINER_NAME = "nodejs-container-${params.BRANCH}"
+                    env.EXTERNAL_PORT = (params.BRANCH == 'main') ? '8000' : '3000'
+                    env.INTERNAL_PORT = (params.BRANCH == 'main') ? '8000' : '3000'
                 }
             }
         }
-
+        
         stage('Checkout Branch') {
             steps {
                 // Pull the selected branch from the repo
@@ -68,7 +67,13 @@ pipeline {
         stage('Run New Container') {
             steps {
                 script {
-                    sh "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${APP_NAME}:${params.BRANCH}"
+                    sh """
+                        docker run -d \
+                        --name ${env.CONTAINER_NAME} \
+                        -p ${env.EXTERNAL_PORT}:${env.INTERNAL_PORT} \
+                        -e PORT=${env.INTERNAL_PORT} \
+                        ${env.APP_NAME}:${params.BRANCH}
+                    """
                 }
             }
         }
